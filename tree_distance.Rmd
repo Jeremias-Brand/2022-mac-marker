@@ -1,0 +1,80 @@
+---
+title: "marker selection"
+author: "Jeremias N. Brand"
+date: "2022-09-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(phangorn)
+library(tidyverse)
+
+################################################################################
+
+## Functions
+
+################################################################################
+
+get_RF_dist <- function(gene_tree, species_tree) {
+  to_drop = species_tree$tip.label[ ! species_tree$tip.label %in% gene_tree$tip.label ]
+  pruned_species_tree = drop.tip(species_tree, to_drop)
+  return(RF.dist(gene_tree, pruned_species_tree, normalize = TRUE))
+}
+
+```
+
+
+```{r}
+H_IQ_TREE <- read.tree('lib/trees/H-IQ-TREE-noPrimer.tre')
+L_IQ_TREE <- read.tree('lib/trees/L-IQ-TREE-noPrimer.tre')
+tree_dir = 'lib/MS_Brand_Phy/renamed_trees/'
+gene_trees_dir <- list.files(tree_dir, pattern = '*.tre')
+lst = paste0(tree_dir, gene_trees_dir)
+dist_df <- data.frame(tree = gene_trees_dir, OG = NA, RF_dist = NA) %>%
+  mutate(OG = gsub('.tre', '', tree))
+
+gene_trees = lapply(lst, read.tree)
+# general stats
+dist_df$n_tips <- sapply(gene_trees, function(x) {
+  return(length(x$tip.label))
+})
+
+dist_df$tips <- sapply(gene_trees, function(x) {
+  return(paste0(x$tip.label, collapse = ', '))
+})
+
+# H iqtree
+RF_lst <- lapply(gene_trees, get_RF_dist, H_IQ_TREE)
+dist_df$RF_dist_H_IQ_TREE <- unlist(RF_lst)
+
+# L iqtree
+RF_lst <- lapply(gene_trees, get_RF_dist, L_IQ_TREE)
+dist_df$RF_dist_L_IQ_TREE <- unlist(RF_lst)
+
+write.csv(dist_df, file = 'RF_dist_OG.csv')
+```
+
+
+```{r}
+  AApos1&2  =  1-604\3, 2-605\3
+  AApos3  =  3-606\3
+  28SAutapoInDels=7583, 7584, 7587, 7593
+```
+cat lib/L/L.model | sed 's/WAG, //' > lib/L/L.model_amas
+cat lib/L/L.cds.model | sed 's/DNA, //' > lib/L/L.cds.model_amas
+git clone https://github.com/marekborowiec/AMAS.git     
+AMAS/amas/AMAS.py split -u fasta -l lib/L/L.model_amas -j -f fasta -d aa -u fasta -i lib/L/L.fa
+
+AMAS/amas/AMAS.py split -u fasta -l lib/L/L.cds.model_amas -j -f fasta -d dna -u fasta -i lib/L/L.cds
+
+
+
+
+
+
+
+

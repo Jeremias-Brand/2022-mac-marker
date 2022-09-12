@@ -1,0 +1,6 @@
+cat lib/L/L.model | sed 's/WAG, //' > lib/L/L.model_amas
+cat lib/L/L.cds.model | sed 's/DNA, //' > lib/L/L.cds.model_amas
+git clone https://github.com/marekborowiec/AMAS.git     
+AMAS/amas/AMAS.py split -u fasta -l lib/L/L.model_amas -j -f fasta -d aa -u fasta -i lib/L/L.fa
+AMAS/amas/AMAS.py split -u fasta -l lib/L/L.cds.model_amas -j -f fasta -d dna -u fasta -i lib/L/L.cds
+
